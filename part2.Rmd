@@ -1,5 +1,5 @@
 ---
-title: "Noah's Rug, Part 1"
+title: "Noah's Rug, Part 2"
 author: "Skip Perry"
 date: "December 2024"
 output: github_document
@@ -8,11 +8,9 @@ output: github_document
 ```{r setup, message=FALSE}
 options(dplyr.summarize.inform = FALSE)
 library(tidyverse)
-
-paste_c <- function(t) { paste0(t, collapse = "") }
 ```
 
-```{r}
+```{r, message=FALSE}
 orders <- 
   "data/noahs-orders.csv" |> 
   vroom::vroom()
@@ -36,8 +34,6 @@ rug_cleaner_orderids <-
   inner_join(products |> filter(str_detect(desc, "Rug Cleaner")), "sku") |> 
   select(orderid) |> 
   distinct()
-
-rug_cleaner_orderids
 ```
 
 ```{r}
@@ -48,8 +44,6 @@ jp <-
       str_sub(name, start = 1L, end = 1L) == "J",
       str_sub(str_remove(name, ".+ "), start = 1L, end = 1L) == "P"
     )
-
-jp
 ```
 
 ```{r}
