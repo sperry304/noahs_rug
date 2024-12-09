@@ -1,0 +1,53 @@
+---
+title: "Noah's Rug, Part 1"
+author: "Skip Perry"
+date: "December 2024"
+output: github_document
+---
+
+```{r setup, message=FALSE}
+options(dplyr.summarize.inform = FALSE)
+library(tidyverse)
+
+paste_c <- function(t) { paste0(t, collapse = "") }
+```
+
+```{r}
+phone_letters <- 
+  tibble(
+    letter = LETTERS,
+    number = c(2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 
+                7, 7, 7, 7, 8, 8, 8, 9, 9, 9, 9)
+  )
+
+phone_letters
+```
+
+```{r}
+df <- 
+  "data/noahs-customers.csv" |> 
+  vroom::vroom()
+
+df
+```
+
+```{r}
+df |> 
+  mutate(
+    name = str_to_upper(str_remove_all(name, ".+ ")),
+    phone = str_remove_all(phone, "-")
+  ) |> 
+  filter(str_length(name) == 10) |> 
+  select(name, phone) |> 
+  separate(name, into = letters[1:11], sep = "") |> 
+  select(-a) |> 
+  pivot_longer(-phone, names_to = "position", values_to = "letter") |> 
+  left_join(phone_letters, by = "letter") |> 
+  group_by(phone) |> 
+  summarize(
+    name = paste_c(letter),
+    number = paste_c(number)
+  ) |> 
+  filter(phone == number)
+```
+
