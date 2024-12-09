@@ -1,0 +1,44 @@
+---
+title: "Noah's Rug, Part 4"
+author: "Skip Perry"
+date: "December 2024"
+output: github_document
+---
+
+```{r setup, message=FALSE}
+options(dplyr.summarize.inform = FALSE)
+library(tidyverse)
+```
+
+```{r, message=FALSE}
+orders <- 
+  "data/noahs-orders.csv" |> 
+  vroom::vroom()
+
+orders_items <- 
+  "data/noahs-orders_items.csv" |> 
+  vroom::vroom()
+
+products <- 
+  "data/noahs-products.csv" |> 
+  vroom::vroom()
+
+customers <- 
+  "data/noahs-customers.csv" |> 
+  vroom::vroom()
+```
+
+```{r}
+orders |> 
+  filter(
+    lubridate::hour(ordered) == 4, 
+    lubridate::hour(shipped) == 4
+  ) |> 
+  left_join(orders_items, by = "orderid") |> 
+  left_join(products, by = "sku") |> 
+  left_join(customers |> select(name, phone, customerid), by = "customerid") |> 
+  filter(!str_detect(desc, "Cat Food")) |> 
+  group_by(orderid, name, phone) |> 
+  summarize(items = paste(desc, collapse = ", ")) |> 
+  knitr::kable()
+```
